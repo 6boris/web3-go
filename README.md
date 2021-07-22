@@ -2,7 +2,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/kylesliu/web3.go">
-    <img src="https://s.gin.sh/blog/blockchain/eth_hero.png" alt="Logo" width="680" height="256">
+    <img src="./assets/img/Ethereum-icon-purple.svg" alt="Logo" width="680" height="256">
   </a>
 
   <h3 align="center">Web3 Go</h3>
