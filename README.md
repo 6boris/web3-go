@@ -27,17 +27,31 @@ This is the Ethereum [Golang API](https://github.com/kylesliu/web3.go) which con
 You need to run a local or remote Ethereum node to use this library.
 
 ## Development Trips
+- [X] Client
+  - [ ] Base Method
+    - [X] eth_chainId
+    - [X] web3_clientVersion
+    - [X] eth_gasPrice
+    - [X] eth_blockNumber
+    - [X] eth_getBalance
+    - [ ] ...
+  - [ ] Middleware
+    - [X] LoadBalance
+    - [ ] Monitor
+    - [ ] CircuitBreaker
+- [ ] Other ...
 
-- [x] web3_clientVersion
-- [ ] net_peerCount
-- [ ] net_listening
-- [ ] ...
+
 
 ## Community
 
 - [web3.js](https://github.com/ChainSafe/web3.js) Ethereum JavaScript API.
 - [Web3j](https://github.com/web3j/web3j) Web3 Java Ethereum Ðapp API.
 - [Web3.py](https://github.com/ethereum/web3.py) A Python library for interacting with Ethereum.
+
+## Provider
+- https://public.blockpi.io/
+
 
 ## Dev tool
 
