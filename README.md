@@ -17,6 +17,9 @@
   </p>
 </p>
 
+[![WEBSITE](https://img.shields.io/badge/Web3-Go-brightgreen)](https://github.com/kylesliu/web3.go)
+[![LISTENSE](https://img.shields.io/github/license/kylesliu/web3.go)](https://github.com/kylesliu/web3.go/blob/main/LICENSE)
+
 ## Introduction
 
 This is the Ethereum [Golang API](https://github.com/kylesliu/web3.go) which connects to the Generic [JSON-RPC](https://github.com/ethereum/wiki/wiki/JSON-RPC) spec.
