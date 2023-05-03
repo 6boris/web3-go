@@ -26,6 +26,36 @@ This is the Ethereum [Golang API](https://github.com/kylesliu/web3.go) which con
 
 You need to run a local or remote Ethereum node to use this library.
 
+### Client
+
+```bash
+go get github.com/6boris/web3.go
+```
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/6boris/web3.go/client"
+)
+
+func main() {
+	ec := client.NewPool(client.GetDefaultConfPool())
+	chainID := int64(1)
+	v, err := ec.GetClient(chainID).ClientVersion(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(fmt.Sprintf("ChainID:%d ClientVersion:%s", chainID, v))
+}
+
+/*
+Output:
+    ChainID:1 ClientVersion:Geth/v1.11.5-omnibus-65be78cc/linux-amd64/go1.19.7
+*/
+```
+
 ## Development Trips
 - [X] Client
   - [ ] Base Method
