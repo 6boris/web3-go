@@ -1,4 +1,4 @@
-module github.com/6boris/web3.go
+module github.com/6boris/web3-go
 
 go 1.20
 

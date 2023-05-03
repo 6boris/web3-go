@@ -2,9 +2,9 @@ package client
 
 func GetDefaultConfPool() *ConfPool {
 	conf := &ConfPool{
-		AppID:   "web3.go.app_id.default",
-		Zone:    "web3.go.zone.default",
-		Cluster: "web3.go.cluster.default",
+		AppID:   "web3.app_id.default",
+		Zone:    "web3.zone.default",
+		Cluster: "web3.cluster.default",
 		Chains: map[int64]*ConfChain{
 			1: {
 				ChainID:         1,

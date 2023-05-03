@@ -13,5 +13,4 @@ func Test_Unite_Convert(t *testing.T) {
 		app.POST("/eth_proxy/:chain_id", NewGinMethodConvert(GetDefaultConfPool()).ConvertGinHandler)
 		_ = app.Run(":20003")
 	})
-
 }

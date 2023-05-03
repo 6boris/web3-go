@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"github.com/6boris/web3.go/consts"
+	"github.com/6boris/web3-go/consts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
