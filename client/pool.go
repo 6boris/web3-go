@@ -11,6 +11,26 @@ type Pool struct {
 	breakerGroup *circuitbreaker.CircuitBreaker
 }
 
+//func init() {
+//	//exporter, err := prometheus.New()
+//	//if err != nil {
+//	//	log.Fatal(err)
+//	//}
+//	//provider := metricSdk.NewMeterProvider(metricSdk.WithReader(exporter))
+//	//meter := provider.Meter("metrics", metric.WithInstrumentationVersion(runtime.Version()))
+//	m1, err := global.Meter("web3.go").Int64Counter("web3_abi_call", metric.WithDescription("Web3 Gateway abi call counter"))
+//	if err != nil {
+//		panic(err)
+//	}
+//	m2, err := global.Meter("web3.go").Int64Histogram("web3_abi_call", metric.WithDescription("Web3 Gateway abi call hist"))
+//	if err != nil {
+//		panic(err)
+//	}
+//	MetricsWeb3RequestCounter = m1
+//	MetricsWeb3RequestHistogram = m2
+//
+//}
+
 func NewPool(conf *ConfPool) *Pool {
 	p := &Pool{
 		conf: conf,
@@ -31,7 +51,7 @@ func NewPool(conf *ConfPool) *Pool {
 				tmpC.Cluster = conf.Cluster
 				tmpC.EthChainID = chain.ChainID
 				tmpC.EthChainName = chain.ChainName
-				tmpC.EthChainName = chain.ChainName
+				tmpC.EthChainEnv = chain.ChainEnv
 				if err != nil {
 				} else {
 					p.clients[chain.ChainID][tmpC.ClientID] = tmpC

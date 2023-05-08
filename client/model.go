@@ -11,6 +11,7 @@ type ConfPool struct {
 type ConfChain struct {
 	ChainID         int64         `yaml:"chain_id" json:"chain_id"`
 	ChainName       string        `yaml:"chain_name" json:"chain_name"`
+	ChainEnv        string        `yaml:"chain_env" json:"chain_env"`
 	OfficialWebsite string        `yaml:"official_website_url" json:"official_website"`
 	ExplorerURL     string        `yaml:"explorer_url" json:"explorer_url"`
 	Faucets         []string      `yaml:"faucets" json:"faucets"`
