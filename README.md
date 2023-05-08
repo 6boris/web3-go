@@ -35,20 +35,23 @@ go get github.com/6boris/web3-go
 package main
 
 import (
-	"context"
-	"fmt"
-	"github.com/6boris/web3-go/client"
+  "context"
+  "fmt"
+  "github.com/6boris/web3-go/client"
+  "github.com/6boris/web3-go/pkg/otel"
 )
 
-func main() {
-	ec := client.NewPool(client.GetDefaultConfPool())
-	chainID := int64(1)
-	v, err := ec.GetClient(chainID).ClientVersion(context.Background())
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(fmt.Sprintf("ChainID:%d ClientVersion:%s", chainID, v))
+func main() { 
+  otel.InitProvider()
+  ec := client.NewPool(client.GetDefaultConfPool())
+  chainID := int64(1)
+  v, err := ec.GetClient(chainID).ClientVersion(context.Background())
+  if err != nil {
+    panic(err)
+  }
+  fmt.Println(fmt.Sprintf("ChainID:%d ClientVersion:%s", chainID, v))
 }
+
 
 /*
 Output:
