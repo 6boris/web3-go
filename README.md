@@ -18,7 +18,7 @@
 </p>
 
 [![WEBSITE](https://img.shields.io/badge/Web3-Go-brightgreen)](https://github.com/kylesliu/web3-go)
-[![LISTENSE](https://img.shields.io/github/license/kylesliu/web3-go)](https://github.com/kylesliu/web3-go/blob/main/LICENSE)
+[![LISTENSE](https://img.shields.io/github/license/6boris/web3-go)](https://github.com/kylesliu/web3-go/blob/main/LICENSE)
 
 ## Introduction
 
