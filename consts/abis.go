@@ -10,6 +10,7 @@ const (
 	AbiMethodEthGetBalance                       = "eth_getBalance"
 	AbiMethodEthBlockNumber                      = "eth_blockNumber"
 	AbiMethodEthGasPrice                         = "eth_gasPrice"
+	AbiMethodEthEstimateGas                      = "eth_estimateGas"
 	AbiMethodEthGetBlockByHash                   = "eth_getBlockByHash"
 	AbiMethodEthGetBlockByNumber                 = "eth_getBlockByNumber"
 	AbiMethodEthGetBlockTransactionCountByHash   = "eth_getBlockTransactionCountByHash"

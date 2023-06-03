@@ -87,6 +87,79 @@ func (ec *Client) Close() {
 	ec.ethClient.Close()
 	return
 }
+
+// Account Information
+
+/*
+BalanceAt eth_getBalance
+
+	Returns the balance of the account of a given address.
+*/
+func (ec *Client) BalanceAt(ctx context.Context, account common.Address, blockNumber *big.Int) (*big.Int, error) {
+	abiMethod := consts.AbiMethodEthGetBalance
+	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	result, err := ec.ethClient.BalanceAt(ctx, account, blockNumber)
+	if err != nil {
+		meta.Status = consts.AbiCallStatusFail
+	}
+	return result, err
+}
+
+/*
+StorageAt eth_getStorageAt
+
+	Returns the value from a storage position at a given address, or in other words, returns the state of the contract's storage,
+	which may not be exposed via the contract's methods.
+*/
+func (ec *Client) StorageAt(ctx context.Context, account common.Address, key common.Hash, blockNumber *big.Int) ([]byte, error) {
+	abiMethod := consts.AbiMethodEthGetStorageAt
+	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	var result []byte
+	var err error
+	result, err = ec.ethClient.StorageAt(ctx, account, key, blockNumber)
+	if err != nil {
+		meta.Status = consts.AbiCallStatusFail
+	}
+	return result, err
+}
+
+/*
+CodeAt eth_getCode
+
+	Returns code at a given address.
+*/
+func (ec *Client) CodeAt(ctx context.Context, account common.Address, blockNumber *big.Int) ([]byte, error) {
+	abiMethod := consts.AbiMethodEthGetCode
+	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	var result []byte
+	var err error
+	result, err = ec.ethClient.CodeAt(ctx, account, blockNumber)
+	if err != nil {
+		meta.Status = consts.AbiCallStatusFail
+	}
+	return result, err
+}
+
+// Chain Information
+
+/*
+ChainID eth_chainId
+
+	The chain ID returned should always correspond to the information in the current known head block.
+	This ensures that caller of this RPC method can always use the retrieved information to sign transactions built on top of the head.
+*/
 func (ec *Client) ChainID(ctx context.Context) (*big.Int, error) {
 	meta := &Metadata{AbiMethod: consts.AbiMethodEthChainID}
 	ec._beforeHooks(ctx, meta)
@@ -100,6 +173,12 @@ func (ec *Client) ChainID(ctx context.Context) (*big.Int, error) {
 	}
 	return result, err
 }
+
+/*
+ClientVersion web3_clientVersion
+
+	Returns the current client version.
+*/
 func (ec *Client) ClientVersion(ctx context.Context) (string, error) {
 	var version string
 	var err error
@@ -119,6 +198,12 @@ func (ec *Client) ClientVersion(ctx context.Context) (string, error) {
 	}
 	return version, err
 }
+
+/*
+NetworkID net_version
+
+	Returns the current network id.
+*/
 func (ec *Client) NetworkID(ctx context.Context) (*big.Int, error) {
 	abiMethod := consts.AbiMethodNetworkID
 	meta := &Metadata{AbiMethod: abiMethod}
@@ -132,6 +217,12 @@ func (ec *Client) NetworkID(ctx context.Context) (*big.Int, error) {
 	}
 	return result, err
 }
+
+// Gas Information
+
+/*
+SyncProgress net_version
+*/
 func (ec *Client) SyncProgress(ctx context.Context) (*ethereum.SyncProgress, error) {
 	abiMethod := consts.AbiMethodEthSyncing
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
@@ -147,6 +238,12 @@ func (ec *Client) SyncProgress(ctx context.Context) (*ethereum.SyncProgress, err
 	}
 	return result, err
 }
+
+/*
+SuggestGasPrice eth_gasPrice
+
+	Returns the current price per gas in wei.
+*/
 func (ec *Client) SuggestGasPrice(ctx context.Context) (*big.Int, error) {
 	abiMethod := consts.AbiMethodEthGasPrice
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
@@ -160,6 +257,34 @@ func (ec *Client) SuggestGasPrice(ctx context.Context) (*big.Int, error) {
 	}
 	return result, err
 }
+
+/*
+EstimateGas eth_gasPrice
+
+	Generates and returns an estimate of how much gas is necessary to allow the transaction to complete.
+	The transaction will not be added to the blockchain.
+*/
+func (ec *Client) EstimateGas(ctx context.Context, msg ethereum.CallMsg) (uint64, error) {
+	abiMethod := consts.AbiMethodEthEstimateGas
+	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	result, err := ec.ethClient.EstimateGas(ctx, msg)
+	if err != nil {
+		meta.Status = consts.AbiCallStatusFail
+	}
+	return result, err
+}
+
+// Blocks
+
+/*
+BlockNumber eth_blockNumber
+
+	Returns the number of the most recent block.
+*/
 func (ec *Client) BlockNumber(ctx context.Context) (uint64, error) {
 	abiMethod := consts.AbiMethodEthBlockNumber
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
@@ -173,32 +298,12 @@ func (ec *Client) BlockNumber(ctx context.Context) (uint64, error) {
 	}
 	return result, err
 }
-func (ec *Client) BalanceAt(ctx context.Context, account common.Address, blockNumber *big.Int) (*big.Int, error) {
-	abiMethod := consts.AbiMethodEthGetBalance
-	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
-	ec._beforeHooks(ctx, meta)
-	defer func() {
-		ec._afterHooks(ctx, meta)
-	}()
-	result, err := ec.ethClient.BalanceAt(ctx, account, blockNumber)
-	if err != nil {
-		meta.Status = consts.AbiCallStatusFail
-	}
-	return result, err
-}
-func (ec *Client) BlockByHash(ctx context.Context, hash common.Hash) (*types.Block, error) {
-	abiMethod := consts.AbiMethodEthGetBlockByHash
-	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
-	ec._beforeHooks(ctx, meta)
-	defer func() {
-		ec._afterHooks(ctx, meta)
-	}()
-	result, err := ec.ethClient.BlockByHash(ctx, hash)
-	if err != nil {
-		meta.Status = consts.AbiCallStatusFail
-	}
-	return result, err
-}
+
+/*
+BlockByNumber eth_getBlockByNumber
+
+	Returns information about a block by block number.
+*/
 func (ec *Client) BlockByNumber(ctx context.Context, number *big.Int) (*types.Block, error) {
 	abiMethod := consts.AbiMethodEthGetBlockByNumber
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
@@ -212,6 +317,12 @@ func (ec *Client) BlockByNumber(ctx context.Context, number *big.Int) (*types.Bl
 	}
 	return result, err
 }
+
+/*
+TransactionCount eth_getBlockTransactionCountByHash
+
+	Returns the number of transactions in a block matching the given block hash.
+*/
 func (ec *Client) TransactionCount(ctx context.Context, blockHash common.Hash) (uint, error) {
 	abiMethod := consts.AbiMethodEthGetBlockTransactionCountByHash
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
@@ -225,6 +336,27 @@ func (ec *Client) TransactionCount(ctx context.Context, blockHash common.Hash) (
 	}
 	return result, err
 }
+
+/*
+BlockByHash eth_getBlockByHash
+*/
+func (ec *Client) BlockByHash(ctx context.Context, hash common.Hash) (*types.Block, error) {
+	abiMethod := consts.AbiMethodEthGetBlockByHash
+	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	result, err := ec.ethClient.BlockByHash(ctx, hash)
+	if err != nil {
+		meta.Status = consts.AbiCallStatusFail
+	}
+	return result, err
+}
+
+/*
+PendingTransactionCount eth_getBlockTransactionCountByNumber
+*/
 func (ec *Client) PendingTransactionCount(ctx context.Context) (uint, error) {
 	abiMethod := consts.AbiMethodEthGetBlockTransactionCountByNumber
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
@@ -238,36 +370,12 @@ func (ec *Client) PendingTransactionCount(ctx context.Context) (uint, error) {
 	}
 	return result, err
 }
-func (ec *Client) GetUncleCountByBlockHash(ctx context.Context, blockHash common.Hash) (string, error) {
-	abiMethod := consts.AbiMethodEthGetUncleCountByBlockHash
-	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
-	ec._beforeHooks(ctx, meta)
-	defer func() {
-		ec._afterHooks(ctx, meta)
-	}()
-	var result string
-	var err error
-	err = ec.rpcClient.CallContext(ctx, &result, abiMethod, blockHash)
-	if err != nil {
-		meta.Status = consts.AbiCallStatusFail
-	}
-	return result, err
-}
-func (ec *Client) GetUncleCountByBlockNumber(ctx context.Context, number *big.Int) (string, error) {
-	abiMethod := consts.AbiMethodEthGetUncleCountByBlockNumber
-	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
-	ec._beforeHooks(ctx, meta)
-	defer func() {
-		ec._afterHooks(ctx, meta)
-	}()
-	var result string
-	var err error
-	err = ec.rpcClient.CallContext(ctx, &result, abiMethod, number)
-	if err != nil {
-		meta.Status = consts.AbiCallStatusFail
-	}
-	return result, err
-}
+
+// Event Logs
+
+/*
+FeeHistory eth_feeHistory
+*/
 func (ec *Client) FeeHistory(ctx context.Context, blockCount uint64, lastBlock *big.Int, rewardPercentiles []float64) (*ethereum.FeeHistory, error) {
 	abiMethod := consts.AbiMethodEthFeeHistory
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
@@ -283,6 +391,10 @@ func (ec *Client) FeeHistory(ctx context.Context, blockCount uint64, lastBlock *
 	}
 	return result, err
 }
+
+/*
+FilterLogs eth_getLogs
+*/
 func (ec *Client) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {
 	abiMethod := consts.AbiMethodEthGetLogs
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
@@ -298,31 +410,45 @@ func (ec *Client) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]typ
 	}
 	return result, err
 }
-func (ec *Client) StorageAt(ctx context.Context, account common.Address, key common.Hash, blockNumber *big.Int) ([]byte, error) {
-	abiMethod := consts.AbiMethodEthGetStorageAt
+
+// Uncle Blocks
+
+/*
+GetUncleCountByBlockHash eth_getUncleCountByBlockHash
+
+	Returns the number of uncles in a block matching the given block hash.
+*/
+func (ec *Client) GetUncleCountByBlockHash(ctx context.Context, blockHash common.Hash) (string, error) {
+	abiMethod := consts.AbiMethodEthGetUncleCountByBlockHash
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
 	ec._beforeHooks(ctx, meta)
 	defer func() {
 		ec._afterHooks(ctx, meta)
 	}()
-	var result []byte
+	var result string
 	var err error
-	result, err = ec.ethClient.StorageAt(ctx, account, key, blockNumber)
+	err = ec.rpcClient.CallContext(ctx, &result, abiMethod, blockHash)
 	if err != nil {
 		meta.Status = consts.AbiCallStatusFail
 	}
 	return result, err
 }
-func (ec *Client) CodeAt(ctx context.Context, account common.Address, blockNumber *big.Int) ([]byte, error) {
-	abiMethod := consts.AbiMethodEthGetCode
+
+/*
+GetUncleCountByBlockNumber eth_getUncleCountByBlockNumber
+
+	Returns the number of uncles in a block matching the give block number.
+*/
+func (ec *Client) GetUncleCountByBlockNumber(ctx context.Context, number *big.Int) (string, error) {
+	abiMethod := consts.AbiMethodEthGetUncleCountByBlockNumber
 	meta := &Metadata{AbiMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
 	ec._beforeHooks(ctx, meta)
 	defer func() {
 		ec._afterHooks(ctx, meta)
 	}()
-	var result []byte
+	var result string
 	var err error
-	result, err = ec.ethClient.CodeAt(ctx, account, blockNumber)
+	err = ec.rpcClient.CallContext(ctx, &result, abiMethod, number)
 	if err != nil {
 		meta.Status = consts.AbiCallStatusFail
 	}
