@@ -221,6 +221,28 @@ func GetDefaultConfPool() *ConfPool {
 					{Provider: "Blast", ProviderWebsite: "https://blastapi.io", TransportSchema: "https", TransportURL: "https://bsc-testnet.public.blastapi.io"},
 				},
 			},
+			250: {
+				ChainID:         250,
+				ChainName:       "Fantom Mainnet",
+				ChainEnv:        consts.ChainEnvMainnet,
+				OfficialWebsite: "",
+				ExplorerURL:     "",
+				Faucets:         []string{},
+				Clients: []*ConfClient{
+					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://rpc.fantom.network"},
+				},
+			},
+			4002: {
+				ChainID:         4002,
+				ChainName:       "Fantom Testnet",
+				ChainEnv:        consts.ChainEnvTestnet,
+				OfficialWebsite: "",
+				ExplorerURL:     "",
+				Faucets:         []string{},
+				Clients: []*ConfClient{
+					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://rpc.ankr.com/fantom_testnet"},
+				},
+			},
 		},
 	}
 	return conf
