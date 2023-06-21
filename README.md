@@ -81,7 +81,7 @@ Output:
     - [ ] Grafana
     - [ ] CircuitBreaker
   - [ ] Business Cases
-  - - [ ] Web3 Studio
+    - [ ] Web3 Studio
 - [ ] Other ...
 
 
