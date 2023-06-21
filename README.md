@@ -1,7 +1,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/6boris/web3-go">
+  <a href="https://github.com/6boris/web3-go" target="_blank">
     <img src="./assets/img/Ethereum-icon-purple.svg" alt="Logo" width="680" height="256">
   </a>
 
@@ -9,11 +9,11 @@
 
   <p align="center">
     Ethereum Dapp Go API, inspired by 
-    <a href="https://github.com/ChainSafe/web3.js">web3.js</a>.
+    <a href="https://github.com/ChainSafe/web3.js" target="_blank">web3.js</a>.
     <br />
-    <a href="https://github.com/6boris/web3-go/issues">Report Bug</a>
+    <a href="https://github.com/6boris/web3-go/issues" target="_blank">Report Bug</a>
     ·
-    <a href="https://github.com/6boris/web3-go/pulls">Pull Request</a>
+    <a href="https://github.com/6boris/web3-go/pulls" target="_blank">Pull Request</a>
   </p>
 </p>
 
@@ -28,7 +28,7 @@ You need to run a local or remote Ethereum node to use this library.
 
 Here is an open source case [Web3 Studio](https://web3-studio.leek.dev/d/demo/web3-studio) reference under.
 
-<a href="https://web3-studio.leek.dev/d/demo/web3-studio">
+<a href="https://web3-studio.leek.dev/d/demo/web3-studio" target="_blank">
   <img src="https://s.gin.sh/develop/web3/web3-studio-demo.png" alt="Logo">
 </a>
 
