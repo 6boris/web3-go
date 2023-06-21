@@ -77,8 +77,11 @@ Output:
     - [ ] ...
   - [ ] Middleware
     - [X] LoadBalance
-    - [ ] Monitor
+    - [X] Metrics
+    - [ ] Grafana
     - [ ] CircuitBreaker
+  - [ ] Business Cases
+  - - [ ] Web3 Studio
 - [ ] Other ...
 
 
