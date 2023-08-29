@@ -16,7 +16,8 @@ node:
 
 console: 
 	geth attach test/geth/data/geth.ipc
-
+lint:
+	golangci-lint run ./...
 clean:
 	rm -rf test/geth/data
 init:

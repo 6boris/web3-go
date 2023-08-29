@@ -32,7 +32,7 @@ type Metadata struct {
 }
 
 type EthCallProxyRequest struct {
-	ChainID int64         `json:"CHainID"`
+	ChainID int64         `json:"chain_id"`
 	ID      int64         `json:"id"`
 	JsonRpc string        `json:"jsonrpc"`
 	Method  string        `json:"method"`

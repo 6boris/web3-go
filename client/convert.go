@@ -2,12 +2,13 @@ package client
 
 import (
 	"fmt"
-	"github.com/6boris/web3-go/consts"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/gin-gonic/gin"
 	"math/big"
 	"net/http"
 	"strconv"
+
+	"github.com/6boris/web3-go/consts"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/gin-gonic/gin"
 )
 
 type GinGinMethodConvert struct {
@@ -33,11 +34,6 @@ func (g *GinGinMethodConvert) ConvertGinHandler(ctx *gin.Context) {
 		ctx.JSON(400, ErrReply{Code: 400, Reason: "PARAMS_ERR", Message: err.Error()})
 		return
 	}
-	req.ChainID, err = strconv.ParseInt(ctx.Param("chain_id"), 10, 64)
-	if err != nil {
-		ctx.JSON(400, ErrReply{Code: 400, Reason: "PARAMS_ERR", Message: err.Error()})
-		return
-	}
 	client := g.pool.GetClient(req.ChainID)
 	if client == nil {
 		ctx.JSON(400, ErrReply{Code: 400, Reason: "PARAMS_ERR", Message: "Not have enable client"})
@@ -59,7 +55,6 @@ func (g *GinGinMethodConvert) ConvertGinHandler(ctx *gin.Context) {
 		ctx.JSON(400, ErrReply{Code: 400, Reason: "PARAMS_ERR", Message: fmt.Sprintf("Not support this method:%s", req.Method)})
 		return
 	}
-
 }
 
 // eth_chainId https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_chainId

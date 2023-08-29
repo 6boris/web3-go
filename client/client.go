@@ -3,6 +3,9 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"math/big"
+	"time"
+
 	"github.com/6boris/web3-go/consts"
 	"github.com/6boris/web3-go/pkg/otel"
 	"github.com/ethereum/go-ethereum"
@@ -12,8 +15,6 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"math/big"
-	"time"
 )
 
 type Client struct {
@@ -54,8 +55,8 @@ func NewClient(conf *ConfClient) (*Client, error) {
 }
 
 func (ec *Client) _beforeHooks(ctx context.Context, meta *Metadata) {
+	_ = ctx
 	meta.StartAt = time.Now()
-
 }
 func (ec *Client) _afterHooks(ctx context.Context, meta *Metadata) {
 	otel.MetricsWeb3RequestCounter.Add(ctx, 1, metric.WithAttributes(
@@ -70,7 +71,7 @@ func (ec *Client) _afterHooks(ctx context.Context, meta *Metadata) {
 		attribute.Key("abi_method").String(meta.AbiMethod),
 		attribute.Key("status").String(meta.Status),
 	))
-	otel.MetricsWeb3RequestHistogram.Record(ctx, time.Now().Sub(meta.StartAt).Milliseconds(), metric.WithAttributes(
+	otel.MetricsWeb3RequestHistogram.Record(ctx, time.Since(meta.StartAt).Milliseconds(), metric.WithAttributes(
 		attribute.Key("client_id").String(ec.ClientID),
 		attribute.Key("app_id").String(ec.AppID),
 		attribute.Key("zone").String(ec.AppID),
@@ -85,7 +86,6 @@ func (ec *Client) _afterHooks(ctx context.Context, meta *Metadata) {
 
 func (ec *Client) Close() {
 	ec.ethClient.Close()
-	return
 }
 
 // Account Information
@@ -426,8 +426,8 @@ func (ec *Client) GetUncleCountByBlockHash(ctx context.Context, blockHash common
 		ec._afterHooks(ctx, meta)
 	}()
 	var result string
-	var err error
-	err = ec.rpcClient.CallContext(ctx, &result, abiMethod, blockHash)
+
+	err := ec.rpcClient.CallContext(ctx, &result, abiMethod, blockHash)
 	if err != nil {
 		meta.Status = consts.AbiCallStatusFail
 	}
@@ -447,8 +447,8 @@ func (ec *Client) GetUncleCountByBlockNumber(ctx context.Context, number *big.In
 		ec._afterHooks(ctx, meta)
 	}()
 	var result string
-	var err error
-	err = ec.rpcClient.CallContext(ctx, &result, abiMethod, number)
+
+	err := ec.rpcClient.CallContext(ctx, &result, abiMethod, number)
 	if err != nil {
 		meta.Status = consts.AbiCallStatusFail
 	}

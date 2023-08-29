@@ -2,14 +2,14 @@ package client
 
 import (
 	"context"
-	"github.com/6boris/web3-go/pkg/otel"
+	"math/big"
+	"os"
+	"testing"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
-	"math/big"
-	"os"
-	"testing"
 )
 
 var (
@@ -24,7 +24,6 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	otel.InitProvider()
 	testPool = NewPool(GetDefaultConfPool())
 	testCtx = context.TODO()
 	//beforeTest(config.Conf)

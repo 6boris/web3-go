@@ -2,9 +2,10 @@ package client
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func Test_Unite_Pool(t *testing.T) {
@@ -41,7 +42,7 @@ func Test_Unite_Pool(t *testing.T) {
 		for _, c := range chainCase {
 			resp, err := testPool.GetClient(c).BlockNumber(testCtx)
 			assert.Nil(t, err)
-			fmt.Println(fmt.Sprintf("ChainID:%d BlockNumber:%d", c, resp))
+			fmt.Println(fmt.Printf("ChainID:%d BlockNumber:%d", c, resp))
 		}
 	})
 }
