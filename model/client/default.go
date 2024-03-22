@@ -7,7 +7,30 @@ func GetDefaultConfPool() *ConfPool {
 		AppID:   "web3.app_id.default",
 		Zone:    "web3.zone.default",
 		Cluster: "web3.cluster.default",
-		Chains: map[int64]*ConfChain{
+		SolanaChains: []*ConfSolanaClient{
+			{
+				ClientID:        "",
+				Provider:        "",
+				ChainEnv:        consts.ChainEnvTestnet,
+				TransportSchema: "http",
+				TransportURL:    "https://api.testnet.solana.com",
+			},
+			{
+				ClientID:        "",
+				Provider:        "",
+				ChainEnv:        consts.ChainEnvDevnet,
+				TransportSchema: "http",
+				TransportURL:    "https://api.devnet.solana.com",
+			},
+			{
+				ClientID:        "",
+				Provider:        "",
+				ChainEnv:        consts.ChainEnvMainnet,
+				TransportSchema: "http",
+				TransportURL:    "https://api.mainnet-beta.solana.com",
+			},
+		},
+		EvmChains: map[int64]*ConfEvmChainInfo{
 			1: {
 				ChainID:         1,
 				ChainName:       "Ethereum Mainnet",
@@ -15,7 +38,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://ethereum.org",
 				ExplorerURL:     "https://etherscan.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "LlamaNodes", ProviderWebsite: "https://llamanodes.com", TransportSchema: "https", TransportURL: "https://eth.llamarpc.com"},
 					{Provider: "OMNIA", ProviderWebsite: "https://omniatech.io", TransportSchema: "https", TransportURL: "https://endpoints.omniatech.io/v1/eth/mainnet/public"},
 					{Provider: "Ankr", ProviderWebsite: "https://www.ankr.com", TransportSchema: "https", TransportURL: "https://rpc.ankr.com/eth"},
@@ -42,7 +65,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://ethereum.org",
 				ExplorerURL:     "https://sepolia.etherscan.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "BlockPI", ProviderWebsite: "https://public.blockpi.io/", TransportSchema: "https", TransportURL: "https://ethereum-sepolia.blockpi.network/v1/rpc/public"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://eth-sepolia.public.blastapi.io"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://rpc2.sepolia.org"},
@@ -58,7 +81,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://ethereum.org",
 				ExplorerURL:     "https://goerli.etherscan.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "BlockPI", ProviderWebsite: "https://public.blockpi.io/", TransportSchema: "https", TransportURL: "https://goerli.blockpi.network/v1/rpc/public"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://rpc.ankr.com/eth_goerli"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://eth-goerli.public.blastapi.io"},
@@ -75,7 +98,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://polygon.technology",
 				ExplorerURL:     "https://polygonscan.com",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "LlamaNodes", ProviderWebsite: "https://llamanodes.com", TransportSchema: "https", TransportURL: "https://polygon.llamarpc.com"},
 					{Provider: "Ankr", ProviderWebsite: "https://polygon-rpc.com", TransportSchema: "https", TransportURL: "https://polygon-rpc.com"},
 					{Provider: "QuickNode", ProviderWebsite: "https://www.quicknode.com", TransportSchema: "https", TransportURL: "https://rpc-mainnet.matic.quiknode.pro"},
@@ -92,7 +115,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://polygon.technology",
 				ExplorerURL:     "https://mumbai.polygonscan.com",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "BlockPI", ProviderWebsite: "https://public.blockpi.io/", TransportSchema: "https", TransportURL: "https://polygon-mumbai.blockpi.network/v1/rpc/public"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://rpc-mumbai.maticvigil.com"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://polygon-testnet.public.blastapi.io"},
@@ -107,7 +130,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://www.optimism.io",
 				ExplorerURL:     "https://optimistic.etherscan.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "BlockPI", ProviderWebsite: "https://public.blockpi.io/", TransportSchema: "https", TransportURL: "https://optimism.blockpi.network/v1/rpc/public"},
 					{Provider: "Alchemy", ProviderWebsite: "https://www.alchemy.com/", TransportSchema: "https", TransportURL: "https://mainnet.optimism.io"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://optimism-mainnet.public.blastapi.io"},
@@ -123,7 +146,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://www.optimism.io",
 				ExplorerURL:     "https://goerli-explorer.optimism.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://optimism-goerli.public.blastapi.io"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://goerli.optimism.io"},
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://opt-goerli.g.alchemy.com/v2/demo"},
@@ -137,7 +160,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://arbitrum.io",
 				ExplorerURL:     "https://arbiscan.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "BlockPI", ProviderWebsite: "https://public.blockpi.io/", TransportSchema: "https", TransportURL: "https://arbitrum.blockpi.network/v1/rpc/public"},
 					{Provider: "Ankr", ProviderWebsite: "https://www.ankr.com", TransportSchema: "https", TransportURL: "https://rpc.ankr.com/arbitrum"},
 					{Provider: "Arbitrum", ProviderWebsite: "https://arbitrum.io", TransportSchema: "https", TransportURL: "https://arb1.arbitrum.io/rpc"},
@@ -150,7 +173,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://arbitrum.io",
 				ExplorerURL:     "https://nova.arbiscan.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "Arbitrum", ProviderWebsite: "https://developer.arbitrum.io/public-chains", TransportSchema: "https", TransportURL: "https://nova.arbitrum.io/rpc"},
 				},
 			},
@@ -161,7 +184,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://arbitrum.io",
 				ExplorerURL:     "https://goerli.arbiscan.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "Arbitrum", ProviderWebsite: "https://developer.arbitrum.io/public-chains", TransportSchema: "https", TransportURL: "https://goerli-rollup.arbitrum.io/rpc"},
 				},
 			},
@@ -172,7 +195,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://www.avax.network",
 				ExplorerURL:     "https://testnet.snowtrace.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "Ankr", ProviderWebsite: "https://developer.arbitrum.io/public-chains", TransportSchema: "https", TransportURL: "https://rpc.ankr.com/avalanche_fuji"},
 				},
 			},
@@ -183,7 +206,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://www.avax.network",
 				ExplorerURL:     "https://testnet.snowtrace.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "Arbitrum", ProviderWebsite: "https://developer.arbitrum.io/public-chains", TransportSchema: "https", TransportURL: "https://rpc.ankr.com/avalanche"},
 				},
 			},
@@ -195,7 +218,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://www.gnosis.io",
 				ExplorerURL:     "https://testnet.snowtrace.io",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "BlockPI", ProviderWebsite: "https://blockscout.com/xdai/mainnet", TransportSchema: "https", TransportURL: "https://gnosis.blockpi.network/v1/rpc/public"},
 				},
 			},
@@ -206,7 +229,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://bscscan.com",
 				ExplorerURL:     "https://bscscan.com",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "BlockPI", ProviderWebsite: "https://public.blockpi.io/", TransportSchema: "https", TransportURL: "https://bsc.blockpi.network/v1/rpc/public"},
 				},
 			},
@@ -217,7 +240,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "https://bscscan.com",
 				ExplorerURL:     "https://testnet.bscscan.com",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "Blast", ProviderWebsite: "https://blastapi.io", TransportSchema: "https", TransportURL: "https://bsc-testnet.public.blastapi.io"},
 				},
 			},
@@ -228,7 +251,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "",
 				ExplorerURL:     "",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://rpc.fantom.network"},
 				},
 			},
@@ -239,7 +262,7 @@ func GetDefaultConfPool() *ConfPool {
 				OfficialWebsite: "",
 				ExplorerURL:     "",
 				Faucets:         []string{},
-				Clients: []*ConfClient{
+				Clients: []*ConfEvmChainClient{
 					{Provider: "Other", ProviderWebsite: "", TransportSchema: "https", TransportURL: "https://rpc.ankr.com/fantom_testnet"},
 				},
 			},

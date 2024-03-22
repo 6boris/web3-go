@@ -1,17 +1,20 @@
 package client
 
 import (
+	"github.com/6boris/web3-go/model/client"
 	"github.com/go-kratos/aegis/circuitbreaker"
 	"github.com/go-kratos/aegis/circuitbreaker/sre"
 )
 
 type Pool struct {
-	conf         *ConfPool
-	clients      map[int64]map[string]*Client
-	breakerGroup *circuitbreaker.CircuitBreaker
+	conf *client.ConfPool
+	// clients        map[int64]map[string]*Client
+	breakerGroup   *circuitbreaker.CircuitBreaker
+	_evmClients    map[int64]map[string]*EvmClient
+	_solanaClients map[string]*SolanaClient
 }
 
-//func init() {
+// func init() {
 //	//exporter, err := prometheus.New()
 //	//if err != nil {
 //	//	log.Fatal(err)
@@ -31,21 +34,22 @@ type Pool struct {
 //
 //}
 
-func NewPool(conf *ConfPool) *Pool {
+func NewPool(conf *client.ConfPool) *Pool {
 	p := &Pool{
-		conf: conf,
+		conf:           conf,
+		_solanaClients: map[string]*SolanaClient{},
 	}
 	b := sre.NewBreaker()
 	p.breakerGroup = &b
 
-	p.clients = make(map[int64]map[string]*Client, 0)
-	for _, chain := range conf.Chains {
-		if _, ok := p.clients[chain.ChainID]; !ok {
-			p.clients[chain.ChainID] = make(map[string]*Client, 0)
+	p._evmClients = make(map[int64]map[string]*EvmClient, 0)
+	for _, chain := range conf.EvmChains {
+		if _, ok := p._evmClients[chain.ChainID]; !ok {
+			p._evmClients[chain.ChainID] = make(map[string]*EvmClient, 0)
 		}
-		for _, client := range chain.Clients {
-			if client.TransportSchema == "https" {
-				tmpC, err := NewClient(client)
+		for _, c := range chain.Clients {
+			if c.TransportSchema == "https" {
+				tmpC, err := NewEvmClient(c)
 				tmpC.AppID = conf.AppID
 				tmpC.Zone = conf.Zone
 				tmpC.Cluster = conf.Cluster
@@ -53,22 +57,40 @@ func NewPool(conf *ConfPool) *Pool {
 				tmpC.EthChainName = chain.ChainName
 				tmpC.EthChainEnv = chain.ChainEnv
 				if err != nil {
+					panic(err)
 				} else {
-					p.clients[chain.ChainID][tmpC.ClientID] = tmpC
+					p._evmClients[chain.ChainID][tmpC.ClientID] = tmpC
 				}
 			}
+		}
+	}
+	for _, c := range p.conf.SolanaChains {
+		loopClient, loopErr := NewSolanaClient(c)
+		if loopErr == nil {
+			p._solanaClients[loopClient.ClientID] = loopClient
 		}
 	}
 	return p
 }
 
-func (p *Pool) GetClient(chainID int64) *Client {
-	if clientMap, ok := p.clients[chainID]; ok {
+func (p *Pool) GetEvmClient(chainID int64) *EvmClient {
+	if clientMap, ok := p._evmClients[chainID]; ok {
 		if len(clientMap) > 0 {
 			for _, val := range clientMap {
 				return val
 			}
 		}
 	}
-	return &Client{}
+	return nil
+}
+func (p *Pool) GetSolanaClient(chainEnv string) *SolanaClient {
+	if len(p._solanaClients) == 0 {
+		return nil
+	}
+	for _, v := range p._solanaClients {
+		if v.ChainEnv == chainEnv {
+			return v
+		}
+	}
+	return nil
 }
