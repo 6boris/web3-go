@@ -45,24 +45,21 @@ import (
   "context"
   "fmt"
   "github.com/6boris/web3-go/client"
-  "github.com/6boris/web3-go/pkg/otel"
+  clientModel "github.com/6boris/web3-go/model/client"
 )
 
-func main() { 
-  otel.InitProvider()
-  ec := client.NewPool(client.GetDefaultConfPool())
+func main() {
+  ec := client.NewPool(clientModel.GetDefaultConfPool())
   chainID := int64(1)
-  v, err := ec.GetClient(chainID).ClientVersion(context.Background())
+  callResp, err := ec.GetEvmClient(chainID).SuggestGasTipCap(context.Background())
   if err != nil {
     panic(err)
   }
-  fmt.Println(fmt.Sprintf("ChainID:%d ClientVersion:%s", chainID, v))
+  fmt.Println(fmt.Sprintf("ChainID:%d GasPrice:%s", chainID, callResp.String()))
 }
-
-
 /*
 Output:
-    ChainID:1 ClientVersion:Geth/v1.11.5-omnibus-65be78cc/linux-amd64/go1.19.7
+    ChainID:1 GasPrice:10670000
 */
 ```
 
