@@ -9,15 +9,20 @@ import (
 )
 
 var (
-	testCtx          context.Context
-	testPool         *Pool
-	testEvmClient    *EvmClient
-	testSolanaClient *SolanaClient
+	testCtx              context.Context
+	testPool             *Pool
+	testEvmEthClient     *EvmClient
+	testEvmPolygonClient *EvmClient
+	testSolanaClient     *SolanaClient
 )
 
 func TestMain(m *testing.M) {
 	var err error
-	testEvmClient, err = NewEvmClient(&clientModel.ConfEvmChainClient{TransportURL: "https://1rpc.io/eth"})
+	testEvmEthClient, err = NewEvmClient(&clientModel.ConfEvmChainClient{TransportURL: "https://1rpc.io/eth"})
+	if err != nil {
+		panic(err)
+	}
+	testEvmPolygonClient, err = NewEvmClient(&clientModel.ConfEvmChainClient{TransportURL: "https://1rpc.io/matic"})
 	if err != nil {
 		panic(err)
 	}

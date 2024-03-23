@@ -6,6 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+
+	"github.com/6boris/web3-go/erc/erc20"
+
 	"github.com/6boris/web3-go/consts"
 	clientModel "github.com/6boris/web3-go/model/client"
 	"github.com/6boris/web3-go/pkg/otel"
@@ -414,4 +418,90 @@ func (ec *EvmClient) NetworkID(ctx context.Context) (*big.Int, error) {
 		meta.Status = consts.AbiCallStatusFail
 	}
 	return result, err
+}
+
+func (ec *EvmClient) ERC20Name(ctx context.Context, token common.Address) (string, error) {
+	abiMethod := consts.EvmErc20MethodName
+	meta := &clientModel.Metadata{CallMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	inst, err := erc20.NewERC20(token, ec.ethClient)
+	if err != nil {
+		return "", err
+	}
+	callResp, err := inst.Name(&bind.CallOpts{Context: ctx})
+	if err != nil {
+		return "", err
+	}
+	return callResp, nil
+}
+func (ec *EvmClient) ERC20Symbol(ctx context.Context, token common.Address) (string, error) {
+	abiMethod := consts.EvmErc20MethodSymbol
+	meta := &clientModel.Metadata{CallMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	inst, err := erc20.NewERC20(token, ec.ethClient)
+	if err != nil {
+		return "", err
+	}
+	callResp, err := inst.Symbol(&bind.CallOpts{Context: ctx})
+	if err != nil {
+		return "", err
+	}
+	return callResp, nil
+}
+func (ec *EvmClient) ERC20Decimals(ctx context.Context, token common.Address) (uint8, error) {
+	abiMethod := consts.EvmErc20MethodDecimals
+	meta := &clientModel.Metadata{CallMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	inst, err := erc20.NewERC20(token, ec.ethClient)
+	if err != nil {
+		return 0, err
+	}
+	callResp, err := inst.Decimals(&bind.CallOpts{Context: ctx})
+	if err != nil {
+		return 0, err
+	}
+	return callResp, nil
+}
+func (ec *EvmClient) ERC20BalanceOf(ctx context.Context, token common.Address, account common.Address) (*big.Int, error) {
+	abiMethod := consts.EvmErc20MethodBalanceOf
+	meta := &clientModel.Metadata{CallMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	inst, err := erc20.NewERC20(token, ec.ethClient)
+	if err != nil {
+		return big.NewInt(0), err
+	}
+	callResp, err := inst.BalanceOf(&bind.CallOpts{Context: ctx}, account)
+	if err != nil {
+		return big.NewInt(0), err
+	}
+	return callResp, nil
+}
+func (ec *EvmClient) ERC20TotalSupply(ctx context.Context, token common.Address) (*big.Int, error) {
+	abiMethod := consts.EvmErc20MethodTotalSupply
+	meta := &clientModel.Metadata{CallMethod: abiMethod, Status: consts.AbiCallStatusSuccess}
+	ec._beforeHooks(ctx, meta)
+	defer func() {
+		ec._afterHooks(ctx, meta)
+	}()
+	inst, err := erc20.NewERC20(token, ec.ethClient)
+	if err != nil {
+		return big.NewInt(0), err
+	}
+	callResp, err := inst.TotalSupply(&bind.CallOpts{Context: ctx})
+	if err != nil {
+		return big.NewInt(0), err
+	}
+	return callResp, nil
 }

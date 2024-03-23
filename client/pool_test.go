@@ -1,8 +1,13 @@
 package client
 
 import (
+	"context"
+	"crypto/ecdsa"
 	"fmt"
+	"log"
 	"testing"
+
+	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/shopspring/decimal"
 
@@ -36,6 +41,32 @@ func Test_Unite_Pool(t *testing.T) {
 			assert.Nil(t, err)
 			fmt.Println(fmt.Printf("ChainID:%d BlockNumber:%d", c, resp))
 		}
+	})
+	t.Run("Evm_SendTransaction", func(t *testing.T) {
+
+		privateKey, err := crypto.HexToECDSA("fad9c8855b740a0b7ed4c221dbad0f33a83a49cad6b3fe8d5817ac83d38b6a19")
+		if err != nil {
+			log.Fatal(err)
+		}
+		publicKey := privateKey.Public()
+		publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+		if !ok {
+			log.Fatal("error casting public key to ECDSA")
+		}
+		testAccount := crypto.PubkeyToAddress(*publicKeyECDSA)
+		fmt.Println("testAccount", testAccount)
+		testChainID := int64(137)
+		nonce, err := testPool.GetEvmClient(testChainID).PendingNonceAt(testCtx, testAccount)
+		assert.Nil(t, err)
+		fmt.Println("Nonce:", nonce)
+		//value := big.NewInt(1000000000000000000)
+		//gasLimit := uint64(21000)
+		gasPrice, err := testPool.GetEvmClient(testChainID).SuggestGasPrice(context.Background())
+		assert.Nil(t, err)
+		fmt.Println("gasPrice:", gasPrice)
+
+		//err := testPool.GetEvmClient(137).SendTransaction(testCtx, nil)
+		//assert.Nil(t, err)
 	})
 	t.Run("Evm_ChainID", func(t *testing.T) {
 		resp, err := testPool.GetEvmClient(1).ChainID(testCtx)

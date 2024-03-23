@@ -1,8 +1,18 @@
 package client
 
 import (
+	"context"
+	"crypto/ecdsa"
+	"fmt"
 	"math/big"
+	"os"
 	"testing"
+
+	"github.com/6boris/web3-go/pkg/wjson"
+
+	"github.com/ethereum/go-ethereum/crypto"
+
+	clientModel "github.com/6boris/web3-go/model/client"
 
 	"github.com/ethereum/go-ethereum/core/types"
 
@@ -18,60 +28,105 @@ func TestNewEvmClient(t *testing.T) {
 	testBlockHash := common.HexToHash("0x21e0118bd8618a14632f82e1445c1f178cfab5bbd2debf1eb3338886ced75e15")
 	testBlockNumber := big.NewInt(19454574)
 	testTxHash := common.HexToHash("0xb382be540032c6751b97cb623ff2bbcd0f1da2a386c4a75f7e561ce4ebefb787")
-
+	testEvmPolygonUSDTAddress := common.HexToAddress("0xc2132D05D31c914a87C6611C10748AEb04B58e8F")
 	t.Run("BlockByHash", func(t *testing.T) {
-		blockInfo, err := testEvmClient.BlockByHash(testCtx, testBlockHash)
+		blockInfo, err := testEvmEthClient.BlockByHash(testCtx, testBlockHash)
 		assert.Nil(t, err)
 		spew.Dump(blockInfo)
 	})
 	t.Run("BlockByNumber", func(t *testing.T) {
-		blockInfo, err := testEvmClient.BlockByNumber(testCtx, testBlockNumber)
+		blockInfo, err := testEvmEthClient.BlockByNumber(testCtx, testBlockNumber)
 		assert.Nil(t, err)
 		spew.Dump(blockInfo)
 	})
 	t.Run("HeaderByHash", func(t *testing.T) {
-		headerInfo, err := testEvmClient.HeaderByHash(testCtx, testBlockHash)
+		headerInfo, err := testEvmEthClient.HeaderByHash(testCtx, testBlockHash)
 		assert.Nil(t, err)
 		spew.Dump(headerInfo)
 	})
 	t.Run("HeaderByNumber", func(t *testing.T) {
-		headerInfo, err := testEvmClient.HeaderByNumber(testCtx, testBlockNumber)
+		headerInfo, err := testEvmEthClient.HeaderByNumber(testCtx, testBlockNumber)
 		assert.Nil(t, err)
 		spew.Dump(headerInfo)
 	})
 	t.Run("TransactionCount", func(t *testing.T) {
-		txCount, err := testEvmClient.TransactionCount(testCtx, testBlockHash)
+		txCount, err := testEvmEthClient.TransactionCount(testCtx, testBlockHash)
 		assert.Nil(t, err)
 		spew.Dump(txCount)
 	})
 	t.Run("TransactionInBlock", func(t *testing.T) {
-		txCount, err := testEvmClient.TransactionInBlock(testCtx, testBlockHash, 1)
+		txCount, err := testEvmEthClient.TransactionInBlock(testCtx, testBlockHash, 1)
 		assert.Nil(t, err)
 		spew.Dump(txCount)
 	})
 	t.Run("TransactionByHash", func(t *testing.T) {
-		txInfo, isPending, err := testEvmClient.TransactionByHash(testCtx, testTxHash)
+		txInfo, isPending, err := testEvmEthClient.TransactionByHash(testCtx, testTxHash)
 		assert.Nil(t, err)
 		spew.Dump(isPending)
 		spew.Dump(txInfo)
 	})
 	t.Run("TransactionReceipt", func(t *testing.T) {
-		txInfo, err := testEvmClient.TransactionReceipt(testCtx, testTxHash)
+		txInfo, err := testEvmEthClient.TransactionReceipt(testCtx, testTxHash)
 		assert.Nil(t, err)
 		spew.Dump(txInfo)
 	})
 	t.Run("SendTransaction", func(t *testing.T) {
 		tx := types.NewContractCreation(0, big.NewInt(0), 2100, big.NewInt(12000), common.FromHex("0x"))
-		err := testEvmClient.SendTransaction(testCtx, tx)
+		err := testEvmEthClient.SendTransaction(testCtx, tx)
 		assert.NotNil(t, err)
 	})
+	t.Run("SendTransaction_Native_Token", func(t *testing.T) {
+		evmClient, err := NewEvmClient(&clientModel.ConfEvmChainClient{TransportURL: os.Getenv("POLYGON_RPC_URL")})
+		assert.Nil(t, err)
+
+		privateKey, err := crypto.HexToECDSA(os.Getenv("POLYGON_PRIVATE_KEY_DEV"))
+		assert.Nil(t, err)
+		publicKey := privateKey.Public()
+		publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
+		assert.Nil(t, err)
+		sendAccount := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+		chainID, err := evmClient.ChainID(context.Background())
+		assert.Nil(t, err)
+
+		nonce, err := evmClient.PendingNonceAt(context.Background(), sendAccount)
+		assert.Nil(t, err)
+
+		gasLimit := uint64(21000)
+		value := decimal.New(1, 0).BigInt()
+		gasPrice, err := evmClient.SuggestGasPrice(testCtx)
+		gasPrice = decimal.NewFromBigInt(gasPrice, 0).
+			Mul(decimal.NewFromFloat(2)).BigInt()
+		assert.Nil(t, err)
+		signedTx, err := types.SignNewTx(privateKey, types.NewEIP155Signer(chainID), &types.LegacyTx{
+			To:       &sendAccount,
+			Nonce:    nonce,
+			Value:    value,
+			Gas:      gasLimit,
+			GasPrice: gasPrice,
+		})
+		assert.Nil(t, err)
+
+		err = evmClient.SendTransaction(context.Background(), signedTx)
+		assert.Nil(t, err)
+		fmt.Println(wjson.StructToJsonStringWithIndent(map[string]interface{}{
+			"chain_id":    chainID,
+			"sendAccount": sendAccount,
+			"toAccount":   sendAccount,
+			"nonce":       nonce,
+			"gas_limit":   gasLimit,
+			"value":       value,
+			"gas_price":   decimal.NewFromBigInt(gasPrice, -9),
+			"tx_hash":     signedTx.Hash().String(),
+		}, "", "  "))
+	})
 	t.Run("BalanceAt", func(t *testing.T) {
-		accountBalance, err := testEvmClient.BalanceAt(testCtx, testAccount, nil)
+		accountBalance, err := testEvmEthClient.BalanceAt(testCtx, testAccount, nil)
 		assert.Nil(t, err)
 		spew.Dump(decimal.NewFromBigInt(accountBalance, -18))
 	})
 	t.Run("StorageAt", func(t *testing.T) {
-		storageBytes, err := testEvmClient.StorageAt(
+		storageBytes, err := testEvmEthClient.StorageAt(
 			testCtx, testAccount,
 			common.HexToHash(""), big.NewInt(19454700),
 		)
@@ -79,7 +134,7 @@ func TestNewEvmClient(t *testing.T) {
 		spew.Dump(storageBytes)
 	})
 	t.Run("CodeAt", func(t *testing.T) {
-		codeBytes, err := testEvmClient.CodeAt(
+		codeBytes, err := testEvmEthClient.CodeAt(
 			testCtx, common.HexToAddress("0xdAC17F958D2ee523a2206206994597C13D831ec7"),
 			big.NewInt(19454700),
 		)
@@ -87,7 +142,7 @@ func TestNewEvmClient(t *testing.T) {
 		spew.Dump(codeBytes)
 	})
 	t.Run("NonceAt", func(t *testing.T) {
-		nonceAt, err := testEvmClient.NonceAt(
+		nonceAt, err := testEvmEthClient.NonceAt(
 			testCtx, testAccount,
 			big.NewInt(19454700),
 		)
@@ -95,17 +150,17 @@ func TestNewEvmClient(t *testing.T) {
 		spew.Dump(nonceAt)
 	})
 	t.Run("SuggestGasPrice", func(t *testing.T) {
-		gasPrice, err := testEvmClient.SuggestGasPrice(testCtx)
+		gasPrice, err := testEvmEthClient.SuggestGasPrice(testCtx)
 		assert.Nil(t, err)
 		spew.Dump(decimal.NewFromBigInt(gasPrice, -18))
 	})
 	t.Run("SuggestGasTipCap", func(t *testing.T) {
-		gasPrice, err := testEvmClient.SuggestGasTipCap(testCtx)
+		gasPrice, err := testEvmEthClient.SuggestGasTipCap(testCtx)
 		assert.Nil(t, err)
 		spew.Dump(decimal.NewFromBigInt(gasPrice, -18))
 	})
 	t.Run("FeeHistory", func(t *testing.T) {
-		feeHistory, err := testEvmClient.FeeHistory(testCtx,
+		feeHistory, err := testEvmEthClient.FeeHistory(testCtx,
 			2,
 			testBlockNumber,
 			[]float64{0.008912678667376286},
@@ -120,17 +175,17 @@ func TestNewEvmClient(t *testing.T) {
 			Gas:   21000,
 			Value: big.NewInt(1),
 		}
-		gasInfo, err := testEvmClient.EstimateGas(testCtx, msg)
+		gasInfo, err := testEvmEthClient.EstimateGas(testCtx, msg)
 		assert.Nil(t, err)
 		spew.Dump(gasInfo)
 	})
 	t.Run("PendingBalanceAt", func(t *testing.T) {
-		accountInfo, err := testEvmClient.PendingBalanceAt(testCtx, testAccount)
+		accountInfo, err := testEvmEthClient.PendingBalanceAt(testCtx, testAccount)
 		assert.Nil(t, err)
 		spew.Dump(decimal.NewFromBigInt(accountInfo, -18))
 	})
 	t.Run("PendingStorageAt", func(t *testing.T) {
-		storageBytes, err := testEvmClient.PendingStorageAt(
+		storageBytes, err := testEvmEthClient.PendingStorageAt(
 			testCtx, testAccount,
 			common.HexToHash(""),
 		)
@@ -138,32 +193,69 @@ func TestNewEvmClient(t *testing.T) {
 		spew.Dump(storageBytes)
 	})
 	t.Run("PendingCodeAt", func(t *testing.T) {
-		codeBytes, err := testEvmClient.PendingCodeAt(
+		codeBytes, err := testEvmEthClient.PendingCodeAt(
 			testCtx, common.HexToAddress("0xdAC17F958D2ee523a2206206994597C13D831ec7"),
 		)
 		assert.Nil(t, err)
 		spew.Dump(codeBytes)
 	})
 	t.Run("PendingNonceAt", func(t *testing.T) {
-		nonceAt, err := testEvmClient.PendingNonceAt(
+		nonceAt, err := testEvmEthClient.PendingNonceAt(
 			testCtx, testAccount,
 		)
 		assert.Nil(t, err)
 		spew.Dump(nonceAt)
 	})
 	t.Run("PendingTransactionCount", func(t *testing.T) {
-		pendingTxCount, err := testEvmClient.PendingTransactionCount(testCtx)
+		pendingTxCount, err := testEvmEthClient.PendingTransactionCount(testCtx)
 		assert.Nil(t, err)
 		spew.Dump(pendingTxCount)
 	})
 	t.Run("BlockNumber", func(t *testing.T) {
-		blockNumber, err := testEvmClient.BlockNumber(testCtx)
+		blockNumber, err := testEvmEthClient.BlockNumber(testCtx)
 		assert.Nil(t, err)
 		spew.Dump(blockNumber)
 	})
 	t.Run("ChainID", func(t *testing.T) {
-		chanID, err := testEvmClient.ChainID(testCtx)
+		chanID, err := testEvmEthClient.ChainID(testCtx)
 		assert.Nil(t, err)
 		spew.Dump(chanID)
+	})
+	t.Run("ERC20Name", func(t *testing.T) {
+		tokenName, err := testEvmPolygonClient.ERC20Name(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+		spew.Dump(tokenName)
+	})
+	t.Run("ERC20Symbol", func(t *testing.T) {
+		tokenSymbol, err := testEvmPolygonClient.ERC20Symbol(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+		spew.Dump(tokenSymbol)
+	})
+	t.Run("ERC20Decimals", func(t *testing.T) {
+		tokenDecimals, err := testEvmPolygonClient.ERC20Decimals(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+		spew.Dump(tokenDecimals)
+	})
+	t.Run("ERC20BalanceOf", func(t *testing.T) {
+		tokenDecimals, err := testEvmPolygonClient.ERC20Decimals(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+
+		tokenBalance, err := testEvmPolygonClient.ERC20BalanceOf(testCtx,
+			testEvmPolygonUSDTAddress,
+			testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+		spew.Dump(decimal.NewFromBigInt(tokenBalance, -int32(tokenDecimals)))
+	})
+	t.Run("ERC20TotalSupply", func(t *testing.T) {
+		tokenSymbol, err := testEvmPolygonClient.ERC20Symbol(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+
+		tokenDecimals, err := testEvmPolygonClient.ERC20Decimals(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+
+		tokenBalance, err := testEvmPolygonClient.ERC20TotalSupply(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+		fmt.Println(fmt.Sprintf("%s %s\n",
+			decimal.NewFromBigInt(tokenBalance, -int32(tokenDecimals)).String(), tokenSymbol))
 	})
 }

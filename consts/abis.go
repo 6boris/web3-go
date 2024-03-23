@@ -29,6 +29,11 @@ const (
 	EvmMethodBlockNumber             = "EVM_BlockNumber"
 	EvmMethodChainID                 = "EVM_ChainID"
 	EvmMethodNetworkID               = "EVM_NetworkID"
+	EvmErc20MethodBalanceOf          = "EVM_ERC20_BalanceOf"
+	EvmErc20MethodName               = "EVM_ERC20_Name"
+	EvmErc20MethodDecimals           = "EVM_ERC20_Decimals"
+	EvmErc20MethodSymbol             = "EVM_ERC20_Symbol"
+	EvmErc20MethodTotalSupply        = "EVM_ERC20_TotalSupply"
 
 	SolanaMethodGetBalance             = "SOLANA_GetBalance"
 	SolanaMethodGetTokenAccountBalance = "SOLANA_GetTokenAccountBalance"
