@@ -50,16 +50,16 @@ func NewPool(conf *client.ConfPool) *Pool {
 		for _, c := range chain.Clients {
 			if c.TransportSchema == "https" {
 				tmpC, err := NewEvmClient(c)
-				tmpC.AppID = conf.AppID
-				tmpC.Zone = conf.Zone
-				tmpC.Cluster = conf.Cluster
-				tmpC.EthChainID = chain.ChainID
-				tmpC.EthChainName = chain.ChainName
-				tmpC.EthChainEnv = chain.ChainEnv
+				tmpC._appID = conf.AppID
+				tmpC._zone = conf.Zone
+				tmpC._cluster = conf.Cluster
+				tmpC._ethChainID = chain.ChainID
+				tmpC._ethChainName = chain.ChainName
+				tmpC._ethChainEnv = chain.ChainEnv
 				if err != nil {
 					panic(err)
 				} else {
-					p._evmClients[chain.ChainID][tmpC.ClientID] = tmpC
+					p._evmClients[chain.ChainID][tmpC._clientID] = tmpC
 				}
 			}
 		}

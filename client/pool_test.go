@@ -7,15 +7,11 @@ import (
 	"log"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/crypto"
-
-	"github.com/shopspring/decimal"
-
 	"github.com/6boris/web3-go/consts"
-
 	"github.com/6boris/web3-go/model/solana"
-
 	"github.com/davecgh/go-spew/spew"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 

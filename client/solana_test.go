@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/6boris/web3-go/model/solana"
-
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
 )

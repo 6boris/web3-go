@@ -9,16 +9,11 @@ import (
 	"testing"
 
 	"github.com/6boris/web3-go/pkg/wjson"
-
-	"github.com/ethereum/go-ethereum/crypto"
-
-	clientModel "github.com/6boris/web3-go/model/client"
-
-	"github.com/ethereum/go-ethereum/core/types"
-
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
@@ -70,31 +65,23 @@ func TestNewEvmClient(t *testing.T) {
 		assert.Nil(t, err)
 		spew.Dump(txInfo)
 	})
-	t.Run("SendTransaction", func(t *testing.T) {
-		tx := types.NewContractCreation(0, big.NewInt(0), 2100, big.NewInt(12000), common.FromHex("0x"))
-		err := testEvmEthClient.SendTransaction(testCtx, tx)
-		assert.NotNil(t, err)
-	})
 	t.Run("SendTransaction_Native_Token", func(t *testing.T) {
-		evmClient, err := NewEvmClient(&clientModel.ConfEvmChainClient{TransportURL: os.Getenv("POLYGON_RPC_URL")})
-		assert.Nil(t, err)
-
-		privateKey, err := crypto.HexToECDSA(os.Getenv("POLYGON_PRIVATE_KEY_DEV"))
+		privateKey, err := crypto.HexToECDSA(os.Getenv("WEB3_GO_DEV_KEY_2"))
 		assert.Nil(t, err)
 		publicKey := privateKey.Public()
 		publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
 		assert.Nil(t, err)
 		sendAccount := crypto.PubkeyToAddress(*publicKeyECDSA)
 
-		chainID, err := evmClient.ChainID(context.Background())
+		chainID, err := testEvmPolygonClient.ChainID(context.Background())
 		assert.Nil(t, err)
 
-		nonce, err := evmClient.PendingNonceAt(context.Background(), sendAccount)
+		nonce, err := testEvmPolygonClient.PendingNonceAt(context.Background(), sendAccount)
 		assert.Nil(t, err)
 
 		gasLimit := uint64(21000)
 		value := decimal.New(1, 0).BigInt()
-		gasPrice, err := evmClient.SuggestGasPrice(testCtx)
+		gasPrice, err := testEvmPolygonClient.SuggestGasPrice(testCtx)
 		gasPrice = decimal.NewFromBigInt(gasPrice, 0).
 			Mul(decimal.NewFromFloat(2)).BigInt()
 		assert.Nil(t, err)
@@ -107,7 +94,7 @@ func TestNewEvmClient(t *testing.T) {
 		})
 		assert.Nil(t, err)
 
-		err = evmClient.SendTransaction(context.Background(), signedTx)
+		err = testEvmPolygonClient.SendTransaction(context.Background(), signedTx)
 		assert.Nil(t, err)
 		fmt.Println(wjson.StructToJsonStringWithIndent(map[string]interface{}{
 			"chain_id":    chainID,
@@ -119,6 +106,16 @@ func TestNewEvmClient(t *testing.T) {
 			"gas_price":   decimal.NewFromBigInt(gasPrice, -9),
 			"tx_hash":     signedTx.Hash().String(),
 		}, "", "  "))
+	})
+	t.Run("SendTransactionSimple", func(t *testing.T) {
+		tx, err := testEvmPolygonClient.SendTransactionSimple(
+			testCtx,
+			testEvmPolygonClient.GetAllSinners()[0],
+			testEvmPolygonClient.GetAllSinners()[1],
+			decimal.NewFromFloat(0.00001).Mul(decimal.New(1, 18)).BigInt(),
+		)
+		assert.Nil(t, err)
+		spew.Dump(tx.Hash())
 	})
 	t.Run("BalanceAt", func(t *testing.T) {
 		accountBalance, err := testEvmEthClient.BalanceAt(testCtx, testAccount, nil)
@@ -255,7 +252,75 @@ func TestNewEvmClient(t *testing.T) {
 
 		tokenBalance, err := testEvmPolygonClient.ERC20TotalSupply(testCtx, testEvmPolygonUSDTAddress)
 		assert.Nil(t, err)
-		fmt.Println(fmt.Sprintf("%s %s\n",
-			decimal.NewFromBigInt(tokenBalance, -int32(tokenDecimals)).String(), tokenSymbol))
+		fmt.Printf("TotalSupply:%s %s\n",
+			decimal.NewFromBigInt(tokenBalance, -int32(tokenDecimals)).String(), tokenSymbol)
+	})
+	t.Run("ERC20Transfer", func(t *testing.T) {
+		tokenDecimals, err := testEvmPolygonClient.ERC20Decimals(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+		txInfo, err := testEvmPolygonClient.ERC20Transfer(
+			testCtx,
+			testEvmPolygonUSDTAddress,
+			testEvmPolygonClient.GetAllSinners()[0],
+			testEvmPolygonClient.GetAllSinners()[1],
+			decimal.NewFromFloat(0.00001).Mul(decimal.New(1, int32(tokenDecimals))).BigInt(),
+		)
+		assert.Nil(t, err)
+		fmt.Println(txInfo.Hash().String())
+	})
+	t.Run("ERC20Approve", func(t *testing.T) {
+		tokenDecimals, err := testEvmPolygonClient.ERC20Decimals(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+
+		txInfo, err := testEvmPolygonClient.ERC20Approve(
+			testCtx,
+			testEvmPolygonUSDTAddress,
+			testEvmPolygonClient.GetAllSinners()[0], testEvmPolygonClient.GetAllSinners()[1],
+			decimal.NewFromFloat(0.00001).Mul(decimal.New(1, int32(tokenDecimals))).BigInt(),
+		)
+		assert.Nil(t, err)
+		fmt.Println("ERC20Approve", txInfo.Hash().String())
+	})
+	t.Run("ERC20IncreaseAllowance", func(t *testing.T) {
+		tokenDecimals, err := testEvmPolygonClient.ERC20Decimals(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+
+		txInfo, err := testEvmPolygonClient.ERC20IncreaseAllowance(
+			testCtx,
+			testEvmPolygonUSDTAddress,
+			testEvmPolygonClient.GetAllSinners()[0], testEvmPolygonClient.GetAllSinners()[1],
+			decimal.NewFromFloat(0.00001).Mul(decimal.New(1, int32(tokenDecimals))).BigInt(),
+		)
+		assert.Nil(t, err)
+		fmt.Println("ERC20Approve", txInfo.Hash().String())
+	})
+	t.Run("ERC20DecreaseAllowance", func(t *testing.T) {
+		tokenDecimals, err := testEvmPolygonClient.ERC20Decimals(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+
+		txInfo, err := testEvmPolygonClient.ERC20DecreaseAllowance(
+			testCtx,
+			testEvmPolygonUSDTAddress,
+			testEvmPolygonClient.GetAllSinners()[0], testEvmPolygonClient.GetAllSinners()[1],
+			decimal.NewFromFloat(0.00001).Mul(decimal.New(1, int32(tokenDecimals))).BigInt(),
+		)
+		assert.Nil(t, err)
+		fmt.Println("ERC20Approve", txInfo.Hash().String())
+	})
+	t.Run("ERC20Allowance", func(t *testing.T) {
+		tokenSymbol, err := testEvmPolygonClient.ERC20Symbol(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+
+		tokenDecimals, err := testEvmPolygonClient.ERC20Decimals(testCtx, testEvmPolygonUSDTAddress)
+		assert.Nil(t, err)
+
+		tokenAllowance, err := testEvmPolygonClient.ERC20Allowance(
+			testCtx,
+			testEvmPolygonUSDTAddress,
+			testEvmPolygonClient.GetAllSinners()[0], testEvmPolygonClient.GetAllSinners()[1],
+		)
+		assert.Nil(t, err)
+		fmt.Printf("ERC20Allowance:%s %s\n",
+			decimal.NewFromBigInt(tokenAllowance, -int32(tokenDecimals)).String(), tokenSymbol)
 	})
 }

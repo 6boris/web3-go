@@ -34,6 +34,11 @@ const (
 	EvmErc20MethodDecimals           = "EVM_ERC20_Decimals"
 	EvmErc20MethodSymbol             = "EVM_ERC20_Symbol"
 	EvmErc20MethodTotalSupply        = "EVM_ERC20_TotalSupply"
+	EvmErc20MethodTransfer           = "EVM_ERC20_Transfer"
+	EvmErc20MethodApprove            = "EVM_ERC20_Approve"
+	EvmErc20MethodIncreaseAllowance  = "EVM_ERC20_IncreaseAllowance"
+	EvmErc20MethodDecreaseAllowance  = "EVM_ERC20_DecreaseAllowance"
+	EvmErc20MethodAllowance          = "EVM_ERC20_Allowance"
 
 	SolanaMethodGetBalance             = "SOLANA_GetBalance"
 	SolanaMethodGetTokenAccountBalance = "SOLANA_GetTokenAccountBalance"

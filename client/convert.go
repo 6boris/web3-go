@@ -6,11 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/6boris/web3-go/model/solana"
-
-	clientModel "github.com/6boris/web3-go/model/client"
-
 	"github.com/6boris/web3-go/consts"
+	clientModel "github.com/6boris/web3-go/model/client"
+	"github.com/6boris/web3-go/model/solana"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-gonic/gin"
 )
@@ -66,7 +64,7 @@ func (g *GinMethodConvert) _convertEvmChainID(ctx *gin.Context, req *clientModel
 	}
 	ethResp, err := client.ChainID(ctx)
 	if err != nil {
-		ctx.JSON(500, &clientModel.ErrReply{Code: 500, Reason: "ETH_ERR", Message: err.Error(), Metadata: map[string]string{"transport_url": client.TransportURL}})
+		ctx.JSON(500, &clientModel.ErrReply{Code: 500, Reason: "ETH_ERR", Message: err.Error(), Metadata: map[string]string{"transport_url": client.GetTransportURL()}})
 		return
 	}
 	resp.Result = fmt.Sprintf("0x%s", ethResp.Text(16))
@@ -81,7 +79,7 @@ func (g *GinMethodConvert) _convertEvmGasPrice(ctx *gin.Context, req *clientMode
 	}
 	ethResp, err := client.SuggestGasPrice(ctx)
 	if err != nil {
-		ctx.JSON(500, &clientModel.ErrReply{Code: 500, Reason: "ETH_ERR", Message: err.Error(), Metadata: map[string]string{"transport_url": client.TransportURL}})
+		ctx.JSON(500, &clientModel.ErrReply{Code: 500, Reason: "ETH_ERR", Message: err.Error(), Metadata: map[string]string{"transport_url": client.GetTransportURL()}})
 		return
 	}
 
@@ -97,7 +95,7 @@ func (g *GinMethodConvert) _convertEvmBlockNumber(ctx *gin.Context, req *clientM
 	}
 	ethResp, err := client.BlockNumber(ctx)
 	if err != nil {
-		ctx.JSON(500, &clientModel.ErrReply{Code: 500, Reason: "ETH_ERR", Message: err.Error(), Metadata: map[string]string{"transport_url": client.TransportURL}})
+		ctx.JSON(500, &clientModel.ErrReply{Code: 500, Reason: "ETH_ERR", Message: err.Error(), Metadata: map[string]string{"transport_url": client.GetTransportURL()}})
 		return
 	}
 	resp.Result = fmt.Sprintf("0x%s", big.NewInt(int64(ethResp)).Text(16))
@@ -124,7 +122,7 @@ func (g *GinMethodConvert) _convertEvmGetBalance(ctx *gin.Context, req *clientMo
 	}
 	ethResp, err := client.BalanceAt(ctx, common.HexToAddress(account), blockNumber)
 	if err != nil {
-		ctx.JSON(500, &clientModel.ErrReply{Code: 500, Reason: "ETH_ERR", Message: err.Error(), Metadata: map[string]string{"transport_url": client.TransportURL}})
+		ctx.JSON(500, &clientModel.ErrReply{Code: 500, Reason: "ETH_ERR", Message: err.Error(), Metadata: map[string]string{"transport_url": client.GetTransportURL()}})
 		return
 	}
 	resp.Result = fmt.Sprintf("0x%s", ethResp.Text(16))

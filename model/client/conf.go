@@ -1,7 +1,12 @@
 package client
 
 import (
+	"crypto/ecdsa"
 	"time"
+
+	"github.com/shopspring/decimal"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 type ConfPool struct {
@@ -21,11 +26,20 @@ type ConfEvmChainInfo struct {
 	Clients         []*ConfEvmChainClient `yaml:"clients" json:"clients"`
 }
 type ConfEvmChainClient struct {
-	ClientID        string `yaml:"client_id" json:"client_id"`
-	Provider        string `yaml:"provider" json:"provider"`
-	ProviderWebsite string `yaml:"provider_website" json:"provider_website"`
-	TransportSchema string `yaml:"transport_schema" json:"transport_schema"`
-	TransportURL    string `yaml:"transport_url" json:"transport_url"`
+	ClientID        string                `yaml:"client_id" json:"client_id"`
+	Provider        string                `yaml:"provider" json:"provider"`
+	ProviderWebsite string                `yaml:"provider_website" json:"provider_website"`
+	TransportSchema string                `yaml:"transport_schema" json:"transport_schema"`
+	TransportURL    string                `yaml:"transport_url" json:"transport_url"`
+	GasFeeRate      decimal.Decimal       `yaml:"gas_fee_rate" json:"gas_fee_rate"`
+	GasLimitRate    decimal.Decimal       `yaml:"gas_limit_rate" json:"gas_limit_rate"`
+	GasLimitMax     decimal.Decimal       `yaml:"gas_limit_max" json:"gas_limit_max"`
+	Signers         []*ConfEvmChainSigner `yaml:"signers" json:"signers"`
+}
+
+type ConfEvmChainSigner struct {
+	PublicAddress common.Address    `json:"public_address"`
+	PrivateKey    *ecdsa.PrivateKey `json:"-"`
 }
 type ConfEvmChain struct {
 	ChainID         int64         `yaml:"chain_id" json:"chain_id"`

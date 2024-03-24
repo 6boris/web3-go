@@ -35,9 +35,17 @@ Here is an open source case [Web3 Studio](https://web3-studio.leek.dev/d/demo/we
 
 ### Client
 
+
+```bash
+export WEB3_GO_DEV_KEY_1="YOU_EVM_PRIVATE_KEY 1"
+export WEB3_GO_DEV_KEY_2="YOU_EVM_PRIVATE_KEY 1"
+```
+
 ```bash
 go get github.com/6boris/web3-go
 ```
+
+
 ```go
 package main
 
@@ -46,20 +54,55 @@ import (
   "fmt"
   "github.com/6boris/web3-go/client"
   clientModel "github.com/6boris/web3-go/model/client"
+  "github.com/6boris/web3-go/pkg/pk"
+  "github.com/ethereum/go-ethereum/common"
+  "github.com/shopspring/decimal"
+  "math/big"
+  "os"
 )
 
 func main() {
-  ec := client.NewPool(clientModel.GetDefaultConfPool())
-  chainID := int64(1)
-  callResp, err := ec.GetEvmClient(chainID).SuggestGasTipCap(context.Background())
+  ctx := context.Background()
+  evmSigners := make([]*clientModel.ConfEvmChainSigner, 0)
+  for _, v := range []string{"WEB3_GO_DEV_KEY_1", "WEB3_GO_DEV_KEY_1"} {
+    signer, loopErr := pk.TransformPkToEvmSigner(os.Getenv(v))
+    if loopErr != nil {
+      continue
+    }
+    evmSigners = append(evmSigners, signer)
+  }
+  ec, err := client.NewEvmClient(&clientModel.ConfEvmChainClient{
+    TransportURL: "https://1rpc.io/matic",
+    GasFeeRate:   decimal.NewFromFloat(2),
+    GasLimitRate: decimal.NewFromFloat(1.5),
+    Signers:      evmSigners,
+  })
+
+  nativeTx, err := ec.SendTransactionSimple(
+    ctx,
+    ec.GetAllSinners()[0], ec.GetAllSinners()[1],
+    big.NewInt(1),
+  )
   if err != nil {
     panic(err)
   }
-  fmt.Println(fmt.Sprintf("ChainID:%d GasPrice:%s", chainID, callResp.String()))
+  fmt.Println(fmt.Sprintf("Native Token Tx: %s", nativeTx.Hash()))
+
+  erc20Tx, err := ec.ERC20Transfer(
+    ctx,
+    common.HexToAddress("0xc2132D05D31c914a87C6611C10748AEb04B58e8F"),
+    ec.GetAllSinners()[0], ec.GetAllSinners()[1],
+    decimal.NewFromFloat(0.000001).Mul(decimal.New(1, int32(6))).BigInt(),
+  )
+  if err != nil {
+    panic(err)
+  }
+  fmt.Println(fmt.Sprintf("USDT Token Tx: %s", erc20Tx.Hash()))
 }
 /*
 Output:
-    ChainID:1 GasPrice:10670000
+    Native Token Tx: 0xf3aa0e634357a222c39e8.......8f1a7e7d313db71827c3
+    USDT Token Tx: 0xedd54d9e6bd3738880cd55........21aa69f06dba1e011625
 */
 ```
 

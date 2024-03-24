@@ -4,17 +4,13 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/imroc/req/v3"
-
 	"github.com/6boris/web3-go/consts"
-
 	clientModel "github.com/6boris/web3-go/model/client"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-gonic/gin"
+	"github.com/imroc/req/v3"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Convert_Server(t *testing.T) {
