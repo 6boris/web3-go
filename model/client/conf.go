@@ -71,6 +71,7 @@ type ConfSolanaClient struct {
 	TransportSchema string `yaml:"transport_schema" json:"transport_schema"`
 	ChainEnv        string `yaml:"chain_env" json:"chain_env"`
 	TransportURL    string `yaml:"transport_url" json:"transport_url"`
+	IsDev           bool   `yaml:"is_dev" json:"is_dev"`
 }
 
 type Metadata struct {

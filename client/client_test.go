@@ -42,7 +42,10 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	testSolanaClient, err = NewSolanaClient(&clientModel.ConfSolanaClient{TransportURL: "https://api.mainnet-beta.solana.com"})
+	testSolanaClient, err = NewSolanaClient(&clientModel.ConfSolanaClient{
+		TransportURL: "https://api.mainnet-beta.solana.com",
+		IsDev:        true,
+	})
 	if err != nil {
 		panic(err)
 	}
